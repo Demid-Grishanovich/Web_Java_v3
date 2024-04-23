@@ -29,6 +29,18 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public User findByUsername(String username) {
+        String sql = "SELECT * FROM users WHERE username = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, username);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return extractUserFromResultSet(rs);
+            }
+        } catch (SQLException ex) {
+            // Log and handle exception
+            ex.printStackTrace();
+        }
         return null;
     }
 
@@ -44,12 +56,13 @@ public class UserDaoImpl implements UserDao {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getEmail());
-            ps.setString(3, user.getPassword()); // Здесь должно быть хеширование пароля
+            ps.setString(3, user.getPassword()); // Нужно добавить хэширование
             ps.executeUpdate();
         } catch (SQLException ex) {
             // Логирование или обработка исключения
             ex.printStackTrace();
-        }}
+        }
+    }
 
     @Override
     public void update(User user) {

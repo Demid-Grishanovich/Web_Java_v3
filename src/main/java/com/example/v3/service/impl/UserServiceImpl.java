@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void createUser(User user) {
-        // Валидация данных пользователя
+        // TODO: Добавьте сюда хэширование пароля перед сохранением в базу
         userDao.create(user);
     }
 

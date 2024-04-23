@@ -13,17 +13,15 @@ import java.io.IOException;
 @WebServlet(name = "AuthenticationController", urlPatterns = {"/login", "/register"})
 public class AuthenticationController extends HttpServlet {
 
-    @Inject
     private UserService userService;
 
-    public AuthenticationController() {
-        // Конструктор по умолчанию
-    }
     @Override
     public void init() {
         ServletContext context = getServletContext();
         userService = (UserService) context.getAttribute("userService");
     }
+
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String path = request.getServletPath();

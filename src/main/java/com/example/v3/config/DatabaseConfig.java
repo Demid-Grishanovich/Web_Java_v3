@@ -8,7 +8,13 @@ public class DatabaseConfig {
     private static final String URL = "jdbc:postgresql://localhost:5432/Jakarta";
     private static final String USERNAME = "postgres";
     private static final String PASSWORD = "root";
-
+    static {
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
     private static DataSource dataSource;
 
     public static DataSource getDataSource() {
