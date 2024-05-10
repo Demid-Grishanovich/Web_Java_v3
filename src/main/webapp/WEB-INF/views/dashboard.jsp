@@ -7,7 +7,7 @@
 <body>
 <h1>Welcome, ${sessionScope.currentUser.username}!</h1>
 <h2>Your Contacts</h2>
-<a href="/contacts?action=add">Add New Contact</a>
+<a href="/v3_war_exploded/addContact">Add New Contact</a>
 <table border="1">
     <tr>
         <th>Name</th>
@@ -27,6 +27,6 @@
 </table>
 
 <h2>Actions</h2>
-<a href="/logout">Logout</a>
+<a href="${pageContext.request.contextPath}/logout">Logout</a>
 </body>
 </html>

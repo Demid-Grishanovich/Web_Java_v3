@@ -10,7 +10,7 @@ import jakarta.servlet.annotation.*;
 
 import java.io.IOException;
 
-@WebServlet(name = "AuthenticationController", urlPatterns = {"/login", "/register"})
+@WebServlet(name = "AuthenticationController", urlPatterns = {"/login", "/register" , "/dashboard", "/logout"})
 public class AuthenticationController extends HttpServlet {
 
     private UserService userService;
@@ -29,6 +29,16 @@ public class AuthenticationController extends HttpServlet {
             request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
         } else if ("/register".equals(path)) {
             request.getRequestDispatcher("/WEB-INF/views/register.jsp").forward(request, response);
+        } else if ("/dashboard".equals(path)) {
+            // Проверка, что пользователь в сессии существует
+            if (request.getSession().getAttribute("currentUser") != null) {
+                request.getRequestDispatcher("/WEB-INF/views/dashboard.jsp").forward(request, response);
+            } else {
+                response.sendRedirect("login"); // Перенаправление на страницу входа, если пользователь не залогинен
+            }
+        } else if ("/logout".equals(path)) {
+            request.getSession().invalidate(); // Удаление всех атрибутов сессии
+            response.sendRedirect("/v3_war_exploded/"); // Перенаправление на страницу входа после выхода
         }
     }
 
@@ -38,11 +48,24 @@ public class AuthenticationController extends HttpServlet {
         if ("/login".equals(path)) {
             String username = request.getParameter("username").trim();
             String password = request.getParameter("password").trim();
+
             if (username.isEmpty() || password.isEmpty()) {
                 request.setAttribute("error", "Username and password must not be empty");
                 request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
                 return;
             }
+
+            User user = userService.getUserByUsername(username);
+            if (user != null && user.getPassword().equals(password)) { // Здесь должно быть безопасное сравнение хэшированных паролей
+                request.getSession().setAttribute("currentUser", user);
+                System.out.println("Redirecting to dashboard...");
+                System.out.println("Current user: " + request.getSession().getAttribute("currentUser"));
+                response.sendRedirect(request.getContextPath() + "/dashboard"); // Перенаправление на страницу dashboard
+            } else {
+                request.setAttribute("error", "Invalid username or password");
+                request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
+            }
+
 
         } else if ("/register".equals(path)) {
             String username = request.getParameter("username").trim();

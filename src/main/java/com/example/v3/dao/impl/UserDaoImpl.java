@@ -82,9 +82,7 @@ public class UserDaoImpl implements UserDao {
         user.setEmail(rs.getString("email"));
         user.setPassword(rs.getString("password"));
         user.setRegisteredAt(rs.getTimestamp("registered_at").toLocalDateTime());
-        if (rs.getTimestamp("last_login") != null) {
-            user.setLastLogin(rs.getTimestamp("last_login").toLocalDateTime());
-        }
+        // Предполагается, что колонка last_login удалена из этого метода
         return user;
     }
 }

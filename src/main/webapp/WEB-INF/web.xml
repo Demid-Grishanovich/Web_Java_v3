@@ -6,4 +6,7 @@
     <listener>
         <listener-class>com.example.v3.AppContextListener</listener-class>
     </listener>
+    <session-config>
+        <session-timeout>30</session-timeout> <!-- Session timeout in minutes -->
+    </session-config>
 </web-app>

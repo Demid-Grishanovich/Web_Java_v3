@@ -3,6 +3,7 @@ package com.example.v3.controller;
 import com.example.v3.model.Contact;
 import com.example.v3.model.User;
 import com.example.v3.service.ContactService;
+import com.example.v3.service.UserService;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
@@ -10,26 +11,34 @@ import jakarta.servlet.annotation.*;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet(name = "ContactController", urlPatterns = {"/contacts"})
+@WebServlet(name = "ContactController", urlPatterns = {"/contacts", "/addContact"})
 public class ContactController extends HttpServlet {
 
     private ContactService contactService;
 
-    public ContactController(ContactService contactService) {
-        this.contactService = contactService;
+    @Override
+    public void init() {
+        ServletContext context = getServletContext();
+        contactService = (ContactService) context.getAttribute("contactService");
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
+        String path = request.getServletPath();
         Integer userId = (Integer) session.getAttribute("userId");
-        if (userId == null) {
-            response.sendRedirect("/login");
+        if (request.getSession().getAttribute("currentUser") == null) {
+            response.sendRedirect("/v3_war_exploded/login");
             return;
         }
-        List<Contact> contacts = contactService.getAllContactsByUserId(userId);
-        request.setAttribute("contacts", contacts);
-        request.getRequestDispatcher("/WEB-INF/views/contacts.jsp").forward(request, response);
+        String action = request.getParameter("action");
+        if ("/addContact".equals(path)) {
+            request.getRequestDispatcher("/WEB-INF/views/addContact.jsp").forward(request, response);
+        } else {
+            List<Contact> contacts = contactService.getAllContactsByUserId(userId);
+            request.setAttribute("contacts", contacts);
+            request.getRequestDispatcher("/WEB-INF/views/contacts.jsp").forward(request, response);
+        }
     }
 
     @Override

@@ -8,7 +8,7 @@ public class User {
     private String email;
     private String password;
     private LocalDateTime registeredAt;
-    private LocalDateTime lastLogin;
+
 
     public User() {
 
@@ -55,21 +55,14 @@ public class User {
         this.registeredAt = registeredAt;
     }
 
-    public LocalDateTime getLastLogin() {
-        return lastLogin;
-    }
 
-    public void setLastLogin(LocalDateTime lastLogin) {
-        this.lastLogin = lastLogin;
-    }
-
-    public User(int id, String username, String email, String password, LocalDateTime registeredAt, LocalDateTime lastLogin) {
+    public User(int id, String username, String email, String password, LocalDateTime registeredAt) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
         this.registeredAt = registeredAt;
-        this.lastLogin = lastLogin;
+
     }
 
     @Override
@@ -80,7 +73,6 @@ public class User {
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", registeredAt=" + registeredAt +
-                ", lastLogin=" + lastLogin +
                 '}';
     }
 }
