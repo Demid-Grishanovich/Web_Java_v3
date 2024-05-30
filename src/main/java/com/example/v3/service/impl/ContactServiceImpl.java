@@ -25,13 +25,11 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     public void createContact(Contact contact) {
-        // Валидация данных контакта
         contactDao.create(contact);
     }
 
     @Override
     public void updateContact(Contact contact) {
-        // Валидация изменений данных контакта
         contactDao.update(contact);
     }
 

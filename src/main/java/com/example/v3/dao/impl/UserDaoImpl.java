@@ -10,7 +10,7 @@ import java.util.List;
 
 public class UserDaoImpl implements UserDao {
 
-    private DataSource dataSource = DatabaseConfig.getDataSource();
+    private final DataSource dataSource = DatabaseConfig.getDataSource();
 
     @Override
     public User findById(int id) {
@@ -22,7 +22,7 @@ public class UserDaoImpl implements UserDao {
                 return extractUserFromResultSet(rs);
             }
         } catch (SQLException ex) {
-            // Log and handle exception
+            ex.printStackTrace();
         }
         return null;
     }
@@ -38,7 +38,6 @@ public class UserDaoImpl implements UserDao {
                 return extractUserFromResultSet(rs);
             }
         } catch (SQLException ex) {
-            // Log and handle exception
             ex.printStackTrace();
         }
         return null;
@@ -46,7 +45,18 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public List<User> findAll() {
-        return null;
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT * FROM users";
+        try (Connection conn = dataSource.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                users.add(extractUserFromResultSet(rs));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return users;
     }
 
     @Override
@@ -56,25 +66,40 @@ public class UserDaoImpl implements UserDao {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getEmail());
-            ps.setString(3, user.getPassword()); // Нужно добавить хэширование
+            ps.setString(3, user.getPassword());
             ps.executeUpdate();
         } catch (SQLException ex) {
-            // Логирование или обработка исключения
             ex.printStackTrace();
         }
     }
 
     @Override
     public void update(User user) {
-
+        String sql = "UPDATE users SET username = ?, email = ?, password = ? WHERE id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, user.getUsername());
+            ps.setString(2, user.getEmail());
+            ps.setString(3, user.getPassword());
+            ps.setInt(4, user.getId());
+            ps.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Override
     public void delete(int id) {
-
+        String sql = "DELETE FROM users WHERE id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
     }
 
-    // Implement other methods using similar patterns
     private User extractUserFromResultSet(ResultSet rs) throws SQLException {
         User user = new User();
         user.setId(rs.getInt("id"));
@@ -82,7 +107,6 @@ public class UserDaoImpl implements UserDao {
         user.setEmail(rs.getString("email"));
         user.setPassword(rs.getString("password"));
         user.setRegisteredAt(rs.getTimestamp("registered_at").toLocalDateTime());
-        // Предполагается, что колонка last_login удалена из этого метода
         return user;
     }
 }

@@ -7,7 +7,29 @@ public class Contact {
     private String phone;
     private String photoUrl;
 
-    // Getters and Setters
+    /**
+     * Default constructor.
+     */
+    public Contact() {
+        // This constructor is intentionally empty. Nothing special is needed here.
+    }
+
+    /**
+     * Constructor to initialize a new contact with user ID, name, phone number, and photo URL.
+     * @param userId the ID of the user associated with this contact
+     * @param name the name of the contact
+     * @param phone the phone number of the contact
+     * @param photoUrl the URL of the contact's photo
+     */
+    public Contact(int userId, String name, String phone, String photoUrl) {
+        this.userId = userId;
+        this.name = name;
+        this.phone = phone;
+        this.photoUrl = photoUrl;
+    }
+
+    // Getters and setters for all fields
+
     public int getId() {
         return id;
     }
@@ -48,6 +70,7 @@ public class Contact {
         this.photoUrl = photoUrl;
     }
 
+
     public Contact(int id, int userId, String name, String phone, String photoUrl) {
         this.id = id;
         this.userId = userId;
@@ -56,8 +79,6 @@ public class Contact {
         this.photoUrl = photoUrl;
     }
 
-    public Contact() {
-    }
 
     @Override
     public String toString() {

@@ -3,7 +3,6 @@ package com.example.v3.controller;
 import com.example.v3.model.Contact;
 import com.example.v3.model.User;
 import com.example.v3.service.ContactService;
-import com.example.v3.service.UserService;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
@@ -25,40 +24,55 @@ public class ContactController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-        String path = request.getServletPath();
-        Integer userId = (Integer) session.getAttribute("userId");
-        if (request.getSession().getAttribute("currentUser") == null) {
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser == null) {
             response.sendRedirect("/v3_war_exploded/login");
             return;
         }
-        String action = request.getParameter("action");
+        String path = request.getServletPath();
         if ("/addContact".equals(path)) {
             request.getRequestDispatcher("/WEB-INF/views/addContact.jsp").forward(request, response);
         } else {
-            List<Contact> contacts = contactService.getAllContactsByUserId(userId);
+            List<Contact> contacts = contactService.getAllContactsByUserId(currentUser.getId());
             request.setAttribute("contacts", contacts);
-            request.getRequestDispatcher("/WEB-INF/views/contacts.jsp").forward(request, response);
+            response.sendRedirect("/v3_war_exploded/dashboard");
         }
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser == null) {
+            response.sendRedirect("/v3_war_exploded/login");
+            return;
+        }
+        processContactAction(request, response, currentUser);
+    }
+
+    private void processContactAction(HttpServletRequest request, HttpServletResponse response, User currentUser) throws IOException, ServletException {
         String action = request.getParameter("action");
         if ("add".equals(action)) {
-            Contact newContact = new Contact();
-            newContact.setUserId(((User) request.getSession().getAttribute("currentUser")).getId());
-            newContact.setName(request.getParameter("name"));
-            newContact.setPhone(request.getParameter("phone"));
-            newContact.setPhotoUrl(request.getParameter("photoUrl")); // URL или путь к файлу фотографии
-            contactService.createContact(newContact);
-            response.sendRedirect("/contacts");
+            createContact(request, currentUser);
         } else if ("update".equals(action)) {
-            handleUpdateContact(request, response);
+            updateContact(request);
         } else if ("delete".equals(action)) {
-            handleDeleteContact(request, response);
+            deleteContact(request);
         }
+        response.sendRedirect("/v3_war_exploded/dashboard");
     }
-    private void handleUpdateContact(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+    private void createContact(HttpServletRequest request, User currentUser) throws ServletException, IOException {
+        Contact newContact = new Contact(
+                currentUser.getId(),
+                request.getParameter("name"),
+                request.getParameter("phone"),
+                request.getParameter("photoUrl")
+        );
+        contactService.createContact(newContact);
+    }
+
+    private void updateContact(HttpServletRequest request) throws ServletException, IOException {
         int contactId = Integer.parseInt(request.getParameter("contactId"));
         Contact contact = contactService.getContactById(contactId);
         if (contact != null) {
@@ -66,15 +80,13 @@ public class ContactController extends HttpServlet {
             contact.setPhone(request.getParameter("phone"));
             contact.setPhotoUrl(request.getParameter("photoUrl"));
             contactService.updateContact(contact);
-            response.sendRedirect("/contacts");
         } else {
-            request.setAttribute("error", "Contact not found");
-            request.getRequestDispatcher("/WEB-INF/views/contacts.jsp").forward(request, response);
+            throw new ServletException("Contact not found");
         }
     }
-    private void handleDeleteContact(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+    private void deleteContact(HttpServletRequest request) throws ServletException, IOException {
         int contactId = Integer.parseInt(request.getParameter("contactId"));
         contactService.deleteContact(contactId);
-        response.sendRedirect("/contacts");
     }
 }

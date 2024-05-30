@@ -10,4 +10,6 @@ public interface UserService {
     void createUser(User user);
     void updateUser(User user);
     void deleteUser(int id);
+    boolean checkPassword(String providedPassword, String storedPassword);
+    String encryptPassword(String password);
 }

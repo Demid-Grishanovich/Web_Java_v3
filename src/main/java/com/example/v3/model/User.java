@@ -9,9 +9,12 @@ public class User {
     private String password;
     private LocalDateTime registeredAt;
 
+    public User() {}
 
-    public User() {
-
+    public User(String username, String email, String password) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
     }
 
     // Getters and Setters
@@ -55,14 +58,12 @@ public class User {
         this.registeredAt = registeredAt;
     }
 
-
     public User(int id, String username, String email, String password, LocalDateTime registeredAt) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
         this.registeredAt = registeredAt;
-
     }
 
     @Override
