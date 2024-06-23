@@ -96,4 +96,3 @@ public class ContactDaoImpl implements ContactDao {
         return contact;
     }
 }
-

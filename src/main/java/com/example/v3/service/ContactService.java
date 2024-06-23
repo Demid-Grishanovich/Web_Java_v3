@@ -9,4 +9,5 @@ public interface ContactService {
     void createContact(Contact contact);
     void updateContact(Contact contact);
     void deleteContact(int id);
+
 }

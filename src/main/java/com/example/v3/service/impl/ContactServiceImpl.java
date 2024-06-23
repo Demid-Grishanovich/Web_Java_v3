@@ -37,4 +37,6 @@ public class ContactServiceImpl implements ContactService {
     public void deleteContact(int id) {
         contactDao.delete(id);
     }
+
+
 }

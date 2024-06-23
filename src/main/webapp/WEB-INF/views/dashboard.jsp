@@ -3,6 +3,25 @@
 <html>
 <head>
     <title>${bundle['dashboard.title']}</title>
+    <style>
+        .edit-btn {
+            background-color: #4CAF50; /* Green */
+            color: white;
+            padding: 8px 16px;
+            margin: 4px 2px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .delete-btn {
+            color: red;
+            background-color: transparent;
+            border: none;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
 <h1>${bundle['dashboard.welcome']} ${sessionScope.currentUser.username}!</h1>
@@ -19,8 +38,16 @@
             <td>${contact.name}</td>
             <td>${contact.phone}</td>
             <td>
-                <a href="${pageContext.request.contextPath}/contacts?action=edit&contactId=${contact.id}">${bundle['dashboard.edit']}</a>
-                <a href="${pageContext.request.contextPath}/contacts?action=delete&contactId=${contact.id}" onclick="return confirm('${bundle['dashboard.confirmDelete']}');">${bundle['dashboard.delete']}</a>
+                <form action="${pageContext.request.contextPath}/editContact" method="GET" style="display: inline;">
+                    <input type="hidden" name="contactId" value="${contact.id}">
+                    <button type="submit" class="edit-btn">${bundle['dashboard.edit']}</button>
+                </form>
+                <form action="${pageContext.request.contextPath}/contacts" method="POST" style="display: inline;">
+                    <input type="hidden" name="action" value="delete">
+                    <input type="hidden" name="contactId" value="${contact.id}">
+                    <button type="submit" class="delete-btn">${bundle['dashboard.delete']}</button>
+                </form>
+
             </td>
         </tr>
     </c:forEach>

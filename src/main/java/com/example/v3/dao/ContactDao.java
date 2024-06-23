@@ -9,4 +9,5 @@ public interface ContactDao {
     void create(Contact contact);
     void update(Contact contact);
     void delete(int id);
+
 }

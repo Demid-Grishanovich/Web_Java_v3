@@ -10,7 +10,7 @@ import jakarta.servlet.annotation.*;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet(name = "ContactController", urlPatterns = {"/contacts", "/addContact"})
+@WebServlet(name = "ContactController", urlPatterns = {"/contacts", "/addContact", "/editContact"})
 public class ContactController extends HttpServlet {
 
     private ContactService contactService;
@@ -32,10 +32,15 @@ public class ContactController extends HttpServlet {
         String path = request.getServletPath();
         if ("/addContact".equals(path)) {
             request.getRequestDispatcher("/WEB-INF/views/addContact.jsp").forward(request, response);
+        } else if ("/editContact".equals(path)) {
+            int contactId = Integer.parseInt(request.getParameter("contactId"));
+            Contact contact = contactService.getContactById(contactId);
+            request.setAttribute("contact", contact);
+            request.getRequestDispatcher("/WEB-INF/views/editContact.jsp").forward(request, response);
         } else {
             List<Contact> contacts = contactService.getAllContactsByUserId(currentUser.getId());
             request.setAttribute("contacts", contacts);
-            response.sendRedirect("/v3_war_exploded/dashboard");
+            request.getRequestDispatcher("/WEB-INF/views/dashboard.jsp").forward(request, response);
         }
     }
 
@@ -87,6 +92,9 @@ public class ContactController extends HttpServlet {
 
     private void deleteContact(HttpServletRequest request) throws ServletException, IOException {
         int contactId = Integer.parseInt(request.getParameter("contactId"));
+        System.out.println("Attempting to delete contact with ID: " + contactId);
         contactService.deleteContact(contactId);
+        System.out.println("Redirecting to dashboard after delete attempt.");
     }
+
 }
