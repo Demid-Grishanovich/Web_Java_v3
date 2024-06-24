@@ -1,16 +1,20 @@
 package com.example.v3.config;
 
+import net.ttddyy.dsproxy.support.ProxyDataSource;
 import org.apache.commons.dbcp2.BasicDataSource;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import net.ttddyy.dsproxy.listener.logging.SLF4JQueryLoggingListener;
+import net.ttddyy.dsproxy.support.ProxyDataSourceBuilder;
+
 
 import javax.sql.DataSource;
 
 public class DatabaseConfig {
+    private static final ProxyDataSource dataSource;
 
-    private static final String URL = "jdbc:postgresql://localhost:5432/Jakarta";
-    private static final String USERNAME = "postgres";
-    private static final String PASSWORD = "root";
 
-    private static volatile BasicDataSource dataSource;
+
 
     static {
         try {
@@ -20,28 +24,24 @@ public class DatabaseConfig {
         }
     }
 
-    public static DataSource getDataSource() {
-        if (dataSource == null) {
-            synchronized (DatabaseConfig.class) {
-                if (dataSource == null) {
-                    dataSource = new BasicDataSource();
-                    dataSource.setUrl(URL);
-                    dataSource.setUsername(USERNAME);
-                    dataSource.setPassword(PASSWORD);
-                    dataSource.setMinIdle(5);
-                    dataSource.setMaxIdle(10);
-                    dataSource.setMaxOpenPreparedStatements(100);
+    static {
+        // Настройки HikariCP
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl("jdbc:postgresql://localhost:5432/Jakarta");  // Измените URL на ваш
+        config.setUsername("postgres");  // Измените имя пользователя
+        config.setPassword("root");  // Измените пароль
+        config.addDataSourceProperty("cachePrepStmts", "true");
+        config.addDataSourceProperty("prepStmtCacheSize", "250");
+        config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
 
-
-                }
-            }
-        }
-        return dataSource;
+        // Интеграция Proxy DataSource для логирования SQL запросов
+        dataSource = ProxyDataSourceBuilder.create(new HikariDataSource(config))
+                .name("HikariCP-Proxy")
+                .listener(new SLF4JQueryLoggingListener())
+                .build();
     }
 
-
-    private static DataSource createProxyDataSource(DataSource realDataSource) {
-
-        return realDataSource;
+    public static DataSource getDataSource() {
+        return dataSource;
     }
 }

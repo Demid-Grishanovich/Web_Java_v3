@@ -122,7 +122,69 @@
             <artifactId>datasource-proxy</artifactId>
             <version>1.7</version>
         </dependency>
-    </dependencies>
+
+
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>5.0.0</version>
+        </dependency>
+
+        <!-- Добавление зависимости для Proxy DataSource -->
+        <dependency>
+            <groupId>net.ttddyy</groupId>
+            <artifactId>datasource-proxy</artifactId>
+            <version>1.7</version>
+        </dependency>
+
+        <!-- SLF4J для логирования (если еще не добавлено) -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.32</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.32</version>
+            <scope>runtime</scope>
+        </dependency>
+
+
+            <!-- Существующие зависимости -->
+
+            <!-- JUnit 5 -->
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-api</artifactId>
+                <version>5.9.2</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
+                <version>5.9.2</version>
+                <scope>test</scope>
+            </dependency>
+
+            <!-- Mockito -->
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-junit-jupiter</artifactId>
+                <version>4.8.0</version>
+                <scope>test</scope>
+            </dependency>
+
+            <!-- Servlet API для тестирования сервлетов -->
+            <dependency>
+                <groupId>jakarta.servlet</groupId>
+                <artifactId>jakarta.servlet-api</artifactId>
+                <version>5.0.0</version>
+                <scope>provided</scope>
+            </dependency>
+        </dependencies>
+
+
 
     <build>
         <plugins>
