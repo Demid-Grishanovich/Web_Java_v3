@@ -7,18 +7,15 @@
         <listener-class>com.example.v3.utility.AppContextListener</listener-class>
     </listener>
 
-
     <filter>
         <filter-name>LocaleFilter</filter-name>
         <filter-class>com.example.v3.utility.LocaleFilter</filter-class>
     </filter>
 
-
     <filter-mapping>
         <filter-name>LocaleFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
-
 
     <servlet>
         <servlet-name>AuthenticationController</servlet-name>
@@ -58,9 +55,6 @@
         <url-pattern>/contacts</url-pattern>
         <url-pattern>/addContact</url-pattern>
         <url-pattern>/editContact</url-pattern>
+        <url-pattern>/contactPhoto</url-pattern>
     </servlet-mapping>
-
-
-
 </web-app>
-
