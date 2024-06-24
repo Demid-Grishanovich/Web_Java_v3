@@ -1,7 +1,6 @@
 package com.example.v3.service;
 
 import com.example.v3.model.Contact;
-
 import java.util.List;
 
 public interface ContactService {

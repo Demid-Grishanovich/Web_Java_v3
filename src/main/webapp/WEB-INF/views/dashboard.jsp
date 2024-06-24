@@ -56,12 +56,21 @@
     <tr>
         <th>${bundle['dashboard.name']}</th>
         <th>${bundle['dashboard.phone']}</th>
+        <th>Photo</th>
         <th>${bundle['dashboard.actions']}</th>
     </tr>
     <c:forEach var="contact" items="${contacts}">
         <tr>
             <td>${contact.name}</td>
             <td>${contact.phone}</td>
+            <td>
+                <c:if test="${not empty contact.photo}">
+                    <img src="${pageContext.request.contextPath}/contactPhoto?id=${contact.id}" alt="Photo" height="50">
+                </c:if>
+                <c:if test="${empty contact.photo}">
+                    No Photo
+                </c:if>
+            </td>
             <td>
                 <form action="${pageContext.request.contextPath}/editContact" method="GET" style="display: inline;">
                     <input type="hidden" name="contactId" value="${contact.id}">

@@ -3,7 +3,6 @@ package com.example.v3.service.impl;
 import com.example.v3.dao.ContactDao;
 import com.example.v3.model.Contact;
 import com.example.v3.service.ContactService;
-
 import java.util.List;
 
 public class ContactServiceImpl implements ContactService {

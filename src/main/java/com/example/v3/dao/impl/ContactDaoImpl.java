@@ -2,16 +2,14 @@ package com.example.v3.dao.impl;
 
 import com.example.v3.dao.ContactDao;
 import com.example.v3.model.Contact;
-import com.example.v3.config.DatabaseConfig;
-
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class ContactDaoImpl implements ContactDao {
     private DataSource dataSource;
@@ -39,7 +37,7 @@ public class ContactDaoImpl implements ContactDao {
                     contact.setUserId(rs.getInt("user_id"));
                     contact.setName(rs.getString("name"));
                     contact.setPhone(rs.getString("phone"));
-                    contact.setPhotoUrl(rs.getString("photo_url"));
+                    contact.setPhoto(rs.getBytes("photo"));
                     contacts.add(contact);
                 }
             }
@@ -71,56 +69,67 @@ public class ContactDaoImpl implements ContactDao {
     }
 
     @Override
-    public Contact getContactById(int contactId) {
-        String sql = "SELECT * FROM contacts WHERE id = ?";
-
+    public Contact getContactById(int id) {
+        String sql = "SELECT id, user_id, name, phone, photo FROM contacts WHERE id = ?";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, contactId);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    Contact contact = new Contact();
-                    contact.setId(rs.getInt("id"));
-                    contact.setUserId(rs.getInt("user_id"));
-                    contact.setName(rs.getString("name"));
-                    contact.setPhone(rs.getString("phone"));
-                    contact.setPhotoUrl(rs.getString("photo_url"));
-                    return contact;
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                Contact contact = new Contact();
+                contact.setId(resultSet.getInt("id"));
+                contact.setUserId(resultSet.getInt("user_id"));
+                contact.setName(resultSet.getString("name"));
+                contact.setPhone(resultSet.getString("phone"));
+                InputStream photoStream = resultSet.getBinaryStream("photo");
+                if (photoStream != null) {
+                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                    byte[] buffer = new byte[4096];
+                    int bytesRead;
+                    while ((bytesRead = photoStream.read(buffer)) != -1) {
+                        outputStream.write(buffer, 0, bytesRead);
+                    }
+                    contact.setPhoto(outputStream.toByteArray());
                 }
+                return contact;
             }
-        } catch (Exception e) {
+        } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
-
         return null;
     }
 
+
     @Override
     public void createContact(Contact contact) {
-        String sql = "INSERT INTO contacts (user_id, name, phone, photo_url) VALUES (?, ?, ?, ?)";
-
+        String sql = "INSERT INTO contacts (user_id, name, phone, photo) VALUES (?, ?, ?, ?)";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, contact.getUserId());
-            ps.setString(2, contact.getName());
-            ps.setString(3, contact.getPhone());
-            ps.setString(4, contact.getPhotoUrl());
-            ps.executeUpdate();
-        } catch (Exception e) {
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, contact.getUserId());
+            statement.setString(2, contact.getName());
+            statement.setString(3, contact.getPhone());
+            if (contact.getPhoto() != null) {
+                statement.setBinaryStream(4, new ByteArrayInputStream(contact.getPhoto()));
+            } else {
+                statement.setNull(4, Types.BINARY);
+            }
+            statement.executeUpdate();
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
+
+
     @Override
     public void updateContact(Contact contact) {
-        String sql = "UPDATE contacts SET name = ?, phone = ?, photo_url = ? WHERE id = ?";
+        String sql = "UPDATE contacts SET name = ?, phone = ?, photo = ? WHERE id = ?";
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, contact.getName());
             ps.setString(2, contact.getPhone());
-            ps.setString(3, contact.getPhotoUrl());
+            ps.setBytes(3, contact.getPhoto());
             ps.setInt(4, contact.getId());
             ps.executeUpdate();
         } catch (Exception e) {
@@ -141,5 +150,3 @@ public class ContactDaoImpl implements ContactDao {
         }
     }
 }
-
-

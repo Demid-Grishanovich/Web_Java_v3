@@ -5,30 +5,28 @@ public class Contact {
     private int userId;
     private String name;
     private String phone;
-    private String photoUrl;
+    private byte[] photo;
 
-    /**
-     * Default constructor.
-     */
+    // Конструкторы
     public Contact() {
-        // This constructor is intentionally empty. Nothing special is needed here.
     }
 
-    /**
-     * Constructor to initialize a new contact with user ID, name, phone number, and photo URL.
-     * @param userId the ID of the user associated with this contact
-     * @param name the name of the contact
-     * @param phone the phone number of the contact
-     * @param photoUrl the URL of the contact's photo
-     */
-    public Contact(int userId, String name, String phone, String photoUrl) {
+    public Contact(int userId, String name, String phone, byte[] photo) {
         this.userId = userId;
         this.name = name;
         this.phone = phone;
-        this.photoUrl = photoUrl;
+        this.photo = photo;
     }
 
-    // Getters and setters for all fields
+    public Contact(int id, int userId, String name, String phone, byte[] photo) {
+        this.id = id;
+        this.userId = userId;
+        this.name = name;
+        this.phone = phone;
+        this.photo = photo;
+    }
+
+    // Геттеры и сеттеры
 
     public int getId() {
         return id;
@@ -62,32 +60,11 @@ public class Contact {
         this.phone = phone;
     }
 
-    public String getPhotoUrl() {
-        return photoUrl;
+    public byte[] getPhoto() {
+        return photo;
     }
 
-    public void setPhotoUrl(String photoUrl) {
-        this.photoUrl = photoUrl;
-    }
-
-
-    public Contact(int id, int userId, String name, String phone, String photoUrl) {
-        this.id = id;
-        this.userId = userId;
-        this.name = name;
-        this.phone = phone;
-        this.photoUrl = photoUrl;
-    }
-
-
-    @Override
-    public String toString() {
-        return "Contact{" +
-                "id=" + id +
-                ", userId=" + userId +
-                ", name='" + name + '\'' +
-                ", phone='" + phone + '\'' +
-                ", photoUrl='" + photoUrl + '\'' +
-                '}';
+    public void setPhoto(byte[] photo) {
+        this.photo = photo;
     }
 }
