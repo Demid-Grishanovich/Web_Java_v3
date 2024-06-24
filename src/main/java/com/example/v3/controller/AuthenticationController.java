@@ -16,6 +16,7 @@ public class AuthenticationController extends HttpServlet {
 
     private UserService userService;
     private ContactService contactService;
+    private static final int RECORDS_PER_PAGE = 5;
 
     @Override
     public void init() throws ServletException {
@@ -66,8 +67,18 @@ public class AuthenticationController extends HttpServlet {
     private void handleDashboardAccess(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         User currentUser = (User) request.getSession().getAttribute("currentUser");
         if (currentUser != null) {
-            List<Contact> contacts = contactService.getAllContactsByUserId(currentUser.getId());
+            int currentPage = 1;
+            if (request.getParameter("page") != null) {
+                currentPage = Integer.parseInt(request.getParameter("page"));
+            }
+            int userId = currentUser.getId();
+            List<Contact> contacts = contactService.getContactsByPage(userId, currentPage, RECORDS_PER_PAGE);
+            int totalRecords = contactService.getTotalContactsByUserId(userId);
+            int totalPages = (int) Math.ceil((double) totalRecords / RECORDS_PER_PAGE);
+
             request.setAttribute("contacts", contacts);
+            request.setAttribute("currentPage", currentPage);
+            request.setAttribute("totalPages", totalPages);
             request.getRequestDispatcher("/WEB-INF/views/dashboard.jsp").forward(request, response);
         } else {
             response.sendRedirect("login");

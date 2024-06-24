@@ -5,7 +5,7 @@
     <title>${bundle['dashboard.title']}</title>
     <style>
         .edit-btn {
-            background-color: #4CAF50; /* Green */
+            background-color: #4CAF50;
             color: white;
             padding: 8px 16px;
             margin: 4px 2px;
@@ -20,6 +20,31 @@
             border: none;
             text-decoration: underline;
             cursor: pointer;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination a {
+            color: black;
+            float: left;
+            padding: 8px 16px;
+            text-decoration: none;
+            transition: background-color .3s;
+        }
+
+        .pagination a.active {
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 5px;
+        }
+
+        .pagination a:hover:not(.active) {
+            background-color: #ddd;
+            border-radius: 5px;
         }
     </style>
 </head>
@@ -47,11 +72,23 @@
                     <input type="hidden" name="contactId" value="${contact.id}">
                     <button type="submit" class="delete-btn">${bundle['dashboard.delete']}</button>
                 </form>
-
             </td>
         </tr>
     </c:forEach>
 </table>
+
+<div class="pagination">
+    <c:if test="${currentPage > 1}">
+        <a href="${pageContext.request.contextPath}/dashboard?page=${currentPage - 1}">&laquo; Previous</a>
+    </c:if>
+    <c:forEach var="i" begin="1" end="${totalPages}">
+        <a href="${pageContext.request.contextPath}/dashboard?page=${i}" class="${i == currentPage ? 'active' : ''}">${i}</a>
+    </c:forEach>
+    <c:if test="${currentPage < totalPages}">
+        <a href="${pageContext.request.contextPath}/dashboard?page=${currentPage + 1}">Next &raquo;</a>
+    </c:if>
+</div>
+
 <h2>${bundle['dashboard.actionsHeader']}</h2>
 <a href="${pageContext.request.contextPath}/logout">${bundle['dashboard.logout']}</a>
 </body>

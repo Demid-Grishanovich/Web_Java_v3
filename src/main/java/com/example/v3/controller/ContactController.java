@@ -10,10 +10,11 @@ import jakarta.servlet.annotation.*;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet(name = "ContactController", urlPatterns = {"/contacts", "/addContact", "/editContact"})
+@WebServlet(name = "ContactController", urlPatterns = {"/contacts", "/addContact", "/editContact", "/dashboard"})
 public class ContactController extends HttpServlet {
 
     private ContactService contactService;
+    private static final int RECORDS_PER_PAGE = 5;
 
     @Override
     public void init() {
@@ -30,17 +31,21 @@ public class ContactController extends HttpServlet {
             return;
         }
         String path = request.getServletPath();
-        if ("/addContact".equals(path)) {
-            request.getRequestDispatcher("/WEB-INF/views/addContact.jsp").forward(request, response);
-        } else if ("/editContact".equals(path)) {
-            int contactId = Integer.parseInt(request.getParameter("contactId"));
-            Contact contact = contactService.getContactById(contactId);
-            request.setAttribute("contact", contact);
-            request.getRequestDispatcher("/WEB-INF/views/editContact.jsp").forward(request, response);
-        } else {
-            List<Contact> contacts = contactService.getAllContactsByUserId(currentUser.getId());
-            request.setAttribute("contacts", contacts);
-            request.getRequestDispatcher("/WEB-INF/views/dashboard.jsp").forward(request, response);
+        switch (path) {
+            case "/addContact":
+                request.getRequestDispatcher("/WEB-INF/views/addContact.jsp").forward(request, response);
+                break;
+            case "/editContact":
+                int contactId = Integer.parseInt(request.getParameter("contactId"));
+                Contact contact = contactService.getContactById(contactId);
+                request.setAttribute("contact", contact);
+                request.getRequestDispatcher("/WEB-INF/views/editContact.jsp").forward(request, response);
+                break;
+            case "/dashboard":
+            case "/contacts":
+            default:
+                handleDashboard(request, response, currentUser);
+                break;
         }
     }
 
@@ -55,16 +60,36 @@ public class ContactController extends HttpServlet {
         processContactAction(request, response, currentUser);
     }
 
+    private void handleDashboard(HttpServletRequest request, HttpServletResponse response, User currentUser) throws ServletException, IOException {
+        int currentPage = 1;
+        if (request.getParameter("page") != null) {
+            currentPage = Integer.parseInt(request.getParameter("page"));
+        }
+        int userId = currentUser.getId();
+        List<Contact> contacts = contactService.getContactsByPage(userId, currentPage, RECORDS_PER_PAGE);
+        int totalRecords = contactService.getTotalContactsByUserId(userId);
+        int totalPages = (int) Math.ceil((double) totalRecords / RECORDS_PER_PAGE);
+
+        request.setAttribute("contacts", contacts);
+        request.setAttribute("currentPage", currentPage);
+        request.setAttribute("totalPages", totalPages);
+        request.getRequestDispatcher("/WEB-INF/views/dashboard.jsp").forward(request, response);
+    }
+
     private void processContactAction(HttpServletRequest request, HttpServletResponse response, User currentUser) throws IOException, ServletException {
         String action = request.getParameter("action");
-        if ("add".equals(action)) {
-            createContact(request, currentUser);
-        } else if ("update".equals(action)) {
-            updateContact(request);
-        } else if ("delete".equals(action)) {
-            deleteContact(request);
+        switch (action) {
+            case "add":
+                createContact(request, currentUser);
+                break;
+            case "update":
+                updateContact(request);
+                break;
+            case "delete":
+                deleteContact(request);
+                break;
         }
-        response.sendRedirect("/v3_war_exploded/dashboard");
+        response.sendRedirect("/v3_war_exploded/contacts");
     }
 
     private void createContact(HttpServletRequest request, User currentUser) throws ServletException, IOException {
@@ -92,9 +117,6 @@ public class ContactController extends HttpServlet {
 
     private void deleteContact(HttpServletRequest request) throws ServletException, IOException {
         int contactId = Integer.parseInt(request.getParameter("contactId"));
-        System.out.println("Attempting to delete contact with ID: " + contactId);
         contactService.deleteContact(contactId);
-        System.out.println("Redirecting to dashboard after delete attempt.");
     }
-
 }

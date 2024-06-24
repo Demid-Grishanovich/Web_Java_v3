@@ -11,6 +11,8 @@ import com.example.v3.dao.impl.UserDaoImpl;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
+import javax.sql.DataSource;
+import com.example.v3.config.DatabaseConfig;
 
 public class AppContextListener implements ServletContextListener {
 
@@ -18,13 +20,16 @@ public class AppContextListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
         ServletContext context = sce.getServletContext();
 
-        // Инициализация UserService
+        // Initialize DataSource
+        DataSource dataSource = DatabaseConfig.getDataSource();
+
+        // Initialize UserService
         UserDao userDao = new UserDaoImpl();
         UserService userService = new UserServiceImpl(userDao);
         context.setAttribute("userService", userService);
 
-        // Инициализация ContactService
-        ContactDao contactDao = new ContactDaoImpl();
+        // Initialize ContactService
+        ContactDao contactDao = new ContactDaoImpl(dataSource);
         ContactService contactService = new ContactServiceImpl(contactDao);
         context.setAttribute("contactService", contactService);
     }

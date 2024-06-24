@@ -4,10 +4,10 @@ import com.example.v3.model.Contact;
 import java.util.List;
 
 public interface ContactDao {
-    Contact findById(int id);
-    List<Contact> findAllByUserId(int userId);
-    void create(Contact contact);
-    void update(Contact contact);
-    void delete(int id);
-
+    List<Contact> getContactsByPage(int userId, int page, int pageSize);
+    int getTotalContactsByUserId(int userId);
+    Contact getContactById(int contactId);
+    void createContact(Contact contact);
+    void updateContact(Contact contact);
+    void deleteContact(int contactId);
 }
