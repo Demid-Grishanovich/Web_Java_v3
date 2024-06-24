@@ -20,15 +20,14 @@ public class AppContextListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
         ServletContext context = sce.getServletContext();
 
-        // Initialize DataSource
+        // Получение DataSource из DatabaseConfig
         DataSource dataSource = DatabaseConfig.getDataSource();
 
-        // Initialize UserService
-        UserDao userDao = new UserDaoImpl();
+        // Инициализация сервисов
+        UserDao userDao = new UserDaoImpl(dataSource);
         UserService userService = new UserServiceImpl(userDao);
         context.setAttribute("userService", userService);
 
-        // Initialize ContactService
         ContactDao contactDao = new ContactDaoImpl(dataSource);
         ContactService contactService = new ContactServiceImpl(contactDao);
         context.setAttribute("contactService", contactService);
@@ -36,6 +35,6 @@ public class AppContextListener implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        // Cleanup code if needed
+        // Очистка ресурсов, если это необходимо
     }
 }

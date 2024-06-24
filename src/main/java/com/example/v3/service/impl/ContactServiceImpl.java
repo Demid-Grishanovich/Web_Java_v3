@@ -3,6 +3,8 @@ package com.example.v3.service.impl;
 import com.example.v3.dao.ContactDao;
 import com.example.v3.model.Contact;
 import com.example.v3.service.ContactService;
+
+import java.sql.SQLException;
 import java.util.List;
 
 public class ContactServiceImpl implements ContactService {
@@ -24,12 +26,20 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     public Contact getContactById(int contactId) {
-        return contactDao.getContactById(contactId);
+        try {
+            return contactDao.getContactById(contactId);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void createContact(Contact contact) {
-        contactDao.createContact(contact);
+        try {
+            contactDao.createContact(contact);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

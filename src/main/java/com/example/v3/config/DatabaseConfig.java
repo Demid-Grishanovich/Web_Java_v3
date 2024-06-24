@@ -10,7 +10,7 @@ public class DatabaseConfig {
     private static final String USERNAME = "postgres";
     private static final String PASSWORD = "root";
 
-    private static BasicDataSource dataSource;
+    private static volatile BasicDataSource dataSource;
 
     static {
         try {
@@ -31,9 +31,17 @@ public class DatabaseConfig {
                     dataSource.setMinIdle(5);
                     dataSource.setMaxIdle(10);
                     dataSource.setMaxOpenPreparedStatements(100);
+
+
                 }
             }
         }
         return dataSource;
+    }
+
+
+    private static DataSource createProxyDataSource(DataSource realDataSource) {
+
+        return realDataSource;
     }
 }

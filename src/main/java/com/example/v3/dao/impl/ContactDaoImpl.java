@@ -69,53 +69,37 @@ public class ContactDaoImpl implements ContactDao {
     }
 
     @Override
-    public Contact getContactById(int id) {
-        String sql = "SELECT id, user_id, name, phone, photo FROM contacts WHERE id = ?";
+    public Contact getContactById(int id) throws SQLException {
+        String query = "SELECT * FROM contacts WHERE id = ?";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+             PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, id);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                Contact contact = new Contact();
-                contact.setId(resultSet.getInt("id"));
-                contact.setUserId(resultSet.getInt("user_id"));
-                contact.setName(resultSet.getString("name"));
-                contact.setPhone(resultSet.getString("phone"));
-                InputStream photoStream = resultSet.getBinaryStream("photo");
-                if (photoStream != null) {
-                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                    byte[] buffer = new byte[4096];
-                    int bytesRead;
-                    while ((bytesRead = photoStream.read(buffer)) != -1) {
-                        outputStream.write(buffer, 0, bytesRead);
-                    }
-                    contact.setPhoto(outputStream.toByteArray());
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return new Contact(
+                            resultSet.getInt("id"),
+                            resultSet.getInt("user_id"),
+                            resultSet.getString("name"),
+                            resultSet.getString("phone"),
+                            resultSet.getBytes("photo")
+                    );
                 }
-                return contact;
             }
-        } catch (SQLException | IOException e) {
-            e.printStackTrace();
         }
         return null;
     }
 
 
     @Override
-    public void createContact(Contact contact) {
-        String sql = "INSERT INTO contacts (user_id, name, phone, photo) VALUES (?, ?, ?, ?)";
+    public void createContact(Contact contact) throws SQLException {
+        String query = "INSERT INTO contacts (user_id, name, phone, photo) VALUES (?, ?, ?, ?)";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+             PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, contact.getUserId());
             statement.setString(2, contact.getName());
             statement.setString(3, contact.getPhone());
-            if (contact.getPhoto() != null) {
-                statement.setBinaryStream(4, new ByteArrayInputStream(contact.getPhoto()));
-            } else {
-                statement.setNull(4, Types.BINARY);
-            }
+            statement.setBytes(4, contact.getPhoto());
             statement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
     }
 
