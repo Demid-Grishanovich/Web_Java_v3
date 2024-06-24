@@ -16,6 +16,6 @@
         </c:forEach>
     </ul>
 </c:if>
-<a href="/home">Go Back to Home</a>
+<a href="v3_war_exploded/index">Go Back to Home</a>
 </body>
 </html>
